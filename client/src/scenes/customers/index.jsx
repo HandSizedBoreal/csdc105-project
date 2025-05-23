@@ -1,12 +1,13 @@
 import React from "react";
-import { Box, useTheme } from "@mui/material";
-import { useGetCustomersQuery } from "state/api";
+import { Box, Button, useTheme } from "@mui/material";
+import { useGetCustomersQuery, useDeleteCustomerMutation } from "state/api";
 import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
 
 const Customers = () => {
   const theme = useTheme();
-  const { data, isLoading } = useGetCustomersQuery();
+  const { data, isLoading, refetch } = useGetCustomersQuery();
+  const [deleteCustomer] = useDeleteCustomerMutation();
   console.log("data", data);
 
   const columns = [
@@ -48,8 +49,34 @@ const Customers = () => {
       headerName: "Role",
       flex: 0.5,
     },
+    {
+      field: "delete",
+      headerName: "Delete",
+      flex: 0.5,
+      renderCell: (params) => {
+        const customerId = params.row._id;
+        return (
+          <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => handleDelete(customerId)}
+          >
+            Delete
+          </Button>
+        );
+      },
+    },
   ];
+const handleDelete = async (customerId) => {
+  if (!customerId) return;
 
+  try {
+    const response = await deleteCustomer(customerId).unwrap();
+    refetch();
+  } catch (error) {
+    console.error(error);
+  }
+}
   return (
     <Box m="1.5rem 2.5rem">
       <Header title="CUSTOMERS" subtitle="List of Customers" />

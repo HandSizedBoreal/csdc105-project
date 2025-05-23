@@ -98,3 +98,17 @@ export const getGeography = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const deleteCustomer = async (req, res) => {
+  const customerId = req.params.id;
+  try {
+    const result = await User.findByIdAndDelete(customerId);
+    if (!result){
+      return res.status(404).json({ message: "Customer not found." });
+    }
+    res.status(200).json({ message: "Customer deleted successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete customer." });
+  }
+};
